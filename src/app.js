@@ -9,7 +9,7 @@ const router = express.Router()
 
 // database
 mongoose.connect(
-    'mongodb+srv://bonitao:entrelogo@cluster0-30dpf.mongodb.net/test?retryWrites=true&w=majority'
+    'mongodb+srv://<user>:<password>@cluster0-30dpf.mongodb.net/test?retryWrites=true&w=majority'
 )
 
 // models
