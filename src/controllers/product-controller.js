@@ -14,34 +14,6 @@ exports.get = (request, response, next) => {
     })
 }
 
-exports.post = (request, response, next) => {
-    var product = new Product(request.body)
-    product.save().then(x => {
-        response.status(201).send({
-            message:'Product created successfully'
-        })
-    }).catch(e => {
-        response.status(400).send({
-            message: 'Product wasn`t created',
-            data: e
-        })
-    })
-}
-
-/*
-exports.put = ('/:id', (request, response, next) => {
-    const id = request.params.id
-    response.status(200).send({
-        id: id,
-        item: request.body
-    })
-})
-*/
-
-exports.delete = ('/', (request, response, next) => {
-    response.status(200).send(request.body)
-})
-
 exports.getBySlug = (request, response, next) => {
     Product.findOne(
         {slug: request.params.slug,
@@ -64,6 +36,20 @@ exports.getByTag = (request, response, next) => {
     })
 }
 
+exports.post = (request, response, next) => {
+    var product = new Product(request.body)
+    product.save().then(x => {
+        response.status(201).send({
+            message:'Product created successfully'
+        })
+    }).catch(e => {
+        response.status(400).send({
+            message: 'Product wasn`t created',
+            data: e
+        })
+    })
+}
+
 exports.put = (request, response, next) => {
     Product.findByIdAndUpdate(
         request.params.id, {
@@ -81,6 +67,19 @@ exports.put = (request, response, next) => {
     }).catch(e => {
         response.status(400).send({
             message: "Ouch :("
+        })
+    })
+}
+
+exports.delete = (request, response, next) => {
+    Product.findOneAndRemove(request.body.id)
+    .then(x => {
+        response.status(200).send({
+            message: "Product deleted!"
+        })
+    }).catch(e => {
+        response.status(400).send({
+            message: "Ouch! Product not deleted :("
         })
     })
 }

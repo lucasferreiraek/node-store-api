@@ -8,9 +8,8 @@ const app = express()
 const router = express.Router()
 
 // database
-mongoose.connect(
-    'mongodb+srv://<user>:<password>@cluster0-30dpf.mongodb.net/test?retryWrites=true&w=majority'
-)
+const DATABASE_CONNECTION = 'mongodb+srv://<user>:<password>@cluster0-30dpf.mongodb.net/test?retryWrites=true&w=majority'
+mongoose.connect(DATABASE_CONNECTION)
 
 // models
 const Product = require('./models/product')
