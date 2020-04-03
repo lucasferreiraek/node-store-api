@@ -1,27 +1,22 @@
-'use strict'
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const mongoose = require('mongoose')
+const app = express();
 
-const app = express()
-const router = express.Router()
+const Product = require('./models/product');
 
-// database
-const DATABASE_CONNECTION = 'mongodb+srv://<user>:<password>@cluster0-30dpf.mongodb.net/test?retryWrites=true&w=majority'
-mongoose.connect(DATABASE_CONNECTION)
+const indexRoute = require('./routes/indexRoute');
+const productRoutes = require('./routes/productRoute');
 
-// models
-const Product = require('./models/product')
+const CONNECTION = 'mongodb+srv://bonitao:entrelogo@cluster0-30dpf.mongodb.net/test?retryWrites=true&w=majority'
+mongoose.connect(CONNECTION);
 
-// routes
-const indexRoute = require('./routes/index')
-const productRoute = require('./routes/product')
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:false}))
+app.use('/', indexRoute);
+app.use('/products', productRoutes);
 
-app.use('/', indexRoute)
-app.use('/products', productRoute)
 
-module.exports = app
+module.exports = app;
