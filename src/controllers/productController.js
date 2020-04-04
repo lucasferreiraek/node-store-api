@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const Product = mongoose.model('Product');
 const validationContract = require('../validators/fluentValidator'); 
+const repository = require('../repositories/productRepository');
 
 
-exports.get = (request, response, next) => {
-    // 1st arg: filters - 2nd arg: required fields
-    Product.find({ active:true }, 'title description price slug')
-    .then(data => {
+exports.listProduct = (request, response, next) => {
+    repository.get().
+    then(data => {
         response.status(200).send(data);
     }).catch(e => {
         response.status(400).send({
@@ -16,11 +16,9 @@ exports.get = (request, response, next) => {
     });
 };
 
-exports.getBySlug = (request, response, next) => {
-    Product.findOne({
-        slug: request.params.slug,
-        active: true
-    }, 'title description slug price')
+exports.listProductBySlug = (request, response, next) => {
+    
+    repository.getBySlug(request.params.slug)
     .then(data => {
         response.status(200).send(data);
     }).catch(e => {
@@ -28,11 +26,9 @@ exports.getBySlug = (request, response, next) => {
     });
 };
 
-exports.getByTag = (request, response, next) => {
-    Product.find({
-        tags: request.params.tag,
-        active: true
-    }, 'title description price tags')
+exports.listProductByTag = (request, response, next) => {
+
+    repository.getByTag(request.params.tag)
     .then(data => {
         response.status(200).send(data);
     }).catch(e => {
@@ -40,20 +36,19 @@ exports.getByTag = (request, response, next) => {
     });
 };
 
-exports.post = (request, response, next) => {
+exports.createProduct = (request, response, next) => {
     let contract = new validationContract();
 
-    contract.hasMinLen(request.body.title, 3, "Title must be 3 caracters");
-    contract.hasMinLen(request.body.slug, 3, "Title must be 3 caracters");
-    contract.hasMinLen(request.body.description, 3, "Title must be 3 caracters");
+    contract.hasMinLen(request.body.title, 3, "Title must be 3 characters at least");
+    contract.hasMinLen(request.body.slug, 3, "Title must be 3 characters at least");
+    contract.hasMinLen(request.body.description, 3, "Title must be 3 characters at least");
 
     if (!contract.isValid()) {
         response.status(400).send(contract.errors()).end();
         return;
     }
 
-    var product = new Product(request.body);
-    product.save()
+    repository.post(request.body)
     .then(x => {
         response.status(200).send({
             message: "Product created successfully"
@@ -66,16 +61,9 @@ exports.post = (request, response, next) => {
     });
 };
 
-exports.put = (request, response, next) => {
-    Product.findByIdAndUpdate(request.params.id, {
-        $set: {
-            title: request.body.title,
-            description: request.body.description,
-            price: request.body.price,
-            slug: request.body.slug,
-            tags: request.body.tags
-        }
-    }).then(x => {
+exports.updateProduct = (request, response, next) => {
+
+    repository.put(request.params.id, request.body).then(x => {
         response.status(200).send({
             message: "Update done!"
         });
@@ -87,8 +75,8 @@ exports.put = (request, response, next) => {
     });
 };
 
-exports.delete = (request, response, next) => {
-    Product.findOneAndRemove(request.body.id)
+exports.deleteProduct = (request, response, next) => {
+    repository.delete(request.body.id)
     .then(data => {
         response.status(200).send({
             message: "Product removed"
